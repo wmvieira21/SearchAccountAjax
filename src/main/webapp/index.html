@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<!--
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Html.html to edit this template
+-->
+<html>
+    <head>
+        <title>Search with Ajax</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css"/>
+        <link href="bootstrap/css/bootstrap.css" rel="stylesheet" type="text/css"/>
+        <script src="jquery/jquery-3.6.4.js" type="text/javascript"></script>
+        <script src="jquery/jquery.validate.min.js" type="text/javascript"></script>
+    </head>
+    <header>
+        <nav class="navbar navbar-black bg-dark">
+            <div style="color: whitesmoke">Search with Ajax</div>
+        </nav>
+    </header>
+    <body>
+        <div class="container" style="margin-top: 20px">
+            <div class="content">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <form id="searchAccount">
+                            <div class="form-group">
+                                <input class="form-control" type="text" name="accountNum" id="accountNum" 
+                                       placeholder="Account number" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Account holder:</label>
+                                <label id="accountName" style="color: red">NONE</label>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Ballance:</label>
+                                <label id="ballance" style="color: red; font-weight: bold"> NONE</label>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Book</label>
+                                <select id="bookSelector" class="form-control">
+                                    <option value="default">Select a book</option>
+                                </select>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <script>
+                $('#accountNum').on('input', function (e) {
+                    search();
+                });
+                getBooks();
+
+                function search() {
+                    $.ajax({
+                        url: "find.jsp",
+                        type: 'POST',
+                        data: {"accont": $("#accountNum").val()},
+                        success: function (data) {
+                            console.log(data);
+                            var obj = JSON.parse(data);
+                            if (obj.length > 0) {
+                                $("#accountName").html(obj[0].name);
+                                $("#ballance").html(obj[0].balance);
+                            } else {
+                                $("#accountName").html("NONE");
+                                $("#ballance").html("NONE");
+                            }
+                        }
+                    });
+                }
+
+
+                function getBooks() {
+                    $.ajax({
+                        url: "getBooks.jsp",
+                        type: 'GET',
+                        dataType: 'JSON',
+                        success: function (data, textStatus, jqXHR) {
+                            console.log(data);
+                            for (var item of data) {
+                                $("#bookSelector").append($("<option/>", {value: item.id, text: item.bookName}));
+                            }
+                        }
+                    });
+                }
+
+            </script>
+    </body>
+</html>
